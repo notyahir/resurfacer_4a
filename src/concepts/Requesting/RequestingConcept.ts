@@ -273,6 +273,7 @@ export function startRequestingServer(
       };
 
       console.log(`[Requesting] Received request for path: ${inputs.path}`);
+      console.log(`[Requesting] Full inputs:`, inputs);
 
       // 1. Trigger the 'request' action.
       const { request } = await Requesting.request(inputs);

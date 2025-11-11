@@ -25,12 +25,19 @@
  */
 
 export const inclusions: Record<string, string> = {
-  // Feel free to delete these example inclusions
-  "/api/LikertSurvey/_getSurveyQuestions": "this is a public query",
-  "/api/LikertSurvey/_getSurveyResponses": "responses are public",
-  "/api/LikertSurvey/_getRespondentAnswers": "answers are visible",
-  "/api/LikertSurvey/submitResponse": "allow anyone to submit response",
-  "/api/LikertSurvey/updateResponse": "allow anyone to update their response",
+  // LibraryCache - Read-only queries that don't modify state
+  "/api/LibraryCache/getLiked": "public read-only query for liked tracks",
+  "/api/LibraryCache/getTracks": "public read-only query for track metadata",
+  "/api/LibraryCache/_getLiked": "internal helper for getting liked tracks",
+  "/api/LibraryCache/_getPlaylist": "internal helper for playlist retrieval",
+
+  // TrackScoring - Read operations and previews
+  "/api/TrackScoring/preview": "public query to preview stale tracks, no auth needed for demo",
+  "/api/TrackScoring/calculateScore": "stateless calculation helper",
+  "/api/TrackScoring/normaliseSize": "utility function for normalizing queue size",
+
+  // PlaylistHealth - Analysis queries (read-only)
+  "/api/PlaylistHealth/getReport": "public query to retrieve analysis reports",
 };
 
 /**
@@ -44,7 +51,43 @@ export const inclusions: Record<string, string> = {
  */
 
 export const exclusions: Array<string> = [
-  // Feel free to delete these example exclusions
-  "/api/LikertSurvey/createSurvey",
-  "/api/LikertSurvey/addQuestion",
+  // PlatformLink - ALL OAuth and sync operations require authentication
+  "/api/PlatformLink/link",
+  "/api/PlatformLink/refresh",
+  "/api/PlatformLink/revoke",
+  "/api/PlatformLink/can",
+  "/api/PlatformLink/startAuth",
+  "/api/PlatformLink/completeAuth",
+  "/api/PlatformLink/listLinks",
+  "/api/PlatformLink/syncLibrary",
+  "/api/PlatformLink/syncLibraryFromSpotify",
+  "/api/PlatformLink/bootstrapTrackScoring",
+
+  // LibraryCache - Write operations that modify state
+  "/api/LibraryCache/ingest",
+  "/api/LibraryCache/sync",
+
+  // TrackScoring - State-modifying operations
+  "/api/TrackScoring/updateWeights",
+  "/api/TrackScoring/updateStats",
+  "/api/TrackScoring/score",
+  "/api/TrackScoring/keep",
+  "/api/TrackScoring/snooze",
+  "/api/TrackScoring/fetchPreviewFromScores",
+  "/api/TrackScoring/bootstrapScores",
+  "/api/TrackScoring/ingestFromLibraryCache",
+
+  // SwipeSessions - ALL session operations require user authentication
+  "/api/SwipeSessions/start",
+  "/api/SwipeSessions/next",
+  "/api/SwipeSessions/decideKeep",
+  "/api/SwipeSessions/decideSnooze",
+  "/api/SwipeSessions/decideAddToPlaylist",
+  "/api/SwipeSessions/decideCreatePlaylist",
+  "/api/SwipeSessions/end",
+  "/api/SwipeSessions/_makeDecision",
+
+  // PlaylistHealth - State-modifying operations
+  "/api/PlaylistHealth/snapshot",
+  "/api/PlaylistHealth/analyze",
 ];

@@ -510,7 +510,11 @@ export default class PlatformLinkConcept {
       }
 
       const audioFeatures = rawTrackIds.size > 0
-        ? await getAudioFeatures(accessToken, Array.from(rawTrackIds))
+        ? await getAudioFeatures(accessToken, Array.from(rawTrackIds)).catch(() => {
+          // Audio Features API deprecated Nov 2024 - gracefully degrade to no features
+          console.warn("[PlatformLink] Audio Features API unavailable (deprecated Nov 2024), continuing without features");
+          return new Map<string, SpotifyAudioFeaturesSnapshot>();
+        })
         : new Map<string, SpotifyAudioFeaturesSnapshot>();
 
       // Build tracks array from map
