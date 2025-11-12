@@ -8,12 +8,12 @@ Still here? Thanks for not getting bored :-D. Below is the table of contents for
 ## Table of Contents
 
 ### 4C Final
-1. [Design Document](https://github.com/notyahir/resurfacer_4a/DesignDoc.md)
-2. [Reflection Document](https://github.com/notyahir/resurfacer_4a/ReflectionDoc.md)
+1. [Design Document](DesignDoc.md)
+2. [Reflection Document](ReflectionDoc.md)
 3. [Resurfacer Wakthrough on Youtube](https://youtu.be/uGwBc_sFEJM)
 4. [Trace Actions](https://github.com/notyahir/resurfacer_4a/TraceActions.md)
-5. [Frontend Codebase](https://github.com/notyahir/resurfacer_4a)
-6. [Backend Codebase](https://github.com/notyahir/resurfacer_frontend4b)
+5. [Frontend Codebase](https://github.com/notyahir/resurfacer_frontend4b)
+6. [Backend Codebase](https://github.com/notyahir/resurfacer_4a)
 
 ### 4B Submission
 We have updated the backend here a LOT which you can see the changes here in:
