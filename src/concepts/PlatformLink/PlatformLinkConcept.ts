@@ -18,6 +18,9 @@ import {
   type SpotifyTokenRequest,
   type SpotifyTokenResult,
   type SpotifyConfig,
+  type SavedTrackItem,
+  type RecentlyPlayedItem,
+  type UserPlaylistItem,
 } from "@utils/spotify.ts";
 
 // Generic types of this concept. User is an external, polymorphic type.
@@ -315,7 +318,7 @@ export default class PlatformLinkConcept {
    * Completes the Spotify OAuth flow with an authorization code and stores the resulting tokens on the link.
    */
   async completeAuth({ state, code }: { state: string; code: string }): Promise<
-    { linkId: LinkId; platform: string; tokenExpiration: number; scopes: string[] } | { error: string }
+    { linkId: LinkId; userId: User; platform: string; tokenExpiration: number; scopes: string[] } | { error: string }
   > {
     const session = await this.authSessions.findOne({ _id: state });
     if (!session) {
@@ -373,7 +376,7 @@ export default class PlatformLinkConcept {
     }
 
     await this.authSessions.deleteOne({ _id: state });
-    return { linkId, platform: session.platform, tokenExpiration, scopes };
+    return { linkId, userId: session.userId, platform: session.platform, tokenExpiration, scopes };
   }
 
   /**
@@ -445,12 +448,31 @@ export default class PlatformLinkConcept {
 
     const accessToken = effective.accessToken;
     try {
-      // Pull data from Spotify
-      const [saved, recent, playlists] = await Promise.all([
-        getAllSavedTracks(accessToken, SPOTIFY_SAVED_TRACK_LIMIT),
-        getRecentlyPlayed(accessToken, SPOTIFY_RECENTLY_PLAYED_LIMIT),
-        getUserPlaylists(accessToken, SPOTIFY_PLAYLIST_LIMIT),
-      ]);
+      // Pull data from Spotify - wrap each call to identify which one fails
+      let saved: SavedTrackItem[] = [];
+      let recent: RecentlyPlayedItem[] = [];
+      let playlists: UserPlaylistItem[] = [];
+
+      try {
+        saved = await getAllSavedTracks(accessToken, SPOTIFY_SAVED_TRACK_LIMIT);
+      } catch (e) {
+        console.warn("[PlatformLink] Failed to get saved tracks:", e instanceof Error ? e.message : e);
+        // Continue with empty saved tracks
+      }
+
+      try {
+        recent = await getRecentlyPlayed(accessToken, SPOTIFY_RECENTLY_PLAYED_LIMIT);
+      } catch (e) {
+        console.warn("[PlatformLink] Failed to get recently played:", e instanceof Error ? e.message : e);
+        // Continue with empty recently played
+      }
+
+      try {
+        playlists = await getUserPlaylists(accessToken, SPOTIFY_PLAYLIST_LIMIT);
+      } catch (e) {
+        console.warn("[PlatformLink] Failed to get playlists:", e instanceof Error ? e.message : e);
+        // Continue with empty playlists
+      }
 
       const trackMap = new Map<string, { trackId: string; rawId: string; title: string; artist: string }>();
       const rawTrackIds = new Set<string>();

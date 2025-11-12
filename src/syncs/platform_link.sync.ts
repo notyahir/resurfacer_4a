@@ -80,12 +80,12 @@ export const CompleteAuthRequest: Sync = ({ request, state, code }) => ({
 /**
  * Sync: Complete Auth Response
  */
-export const CompleteAuthResponse: Sync = ({ request, linkId, platform, tokenExpiration, scopes }) => ({
+export const CompleteAuthResponse: Sync = ({ request, linkId, userId, platform, tokenExpiration, scopes }) => ({
   when: actions(
     [Requesting.request, { path: "/PlatformLink/completeAuth" }, { request }],
-    [PlatformLink.completeAuth, {}, { linkId, platform, tokenExpiration, scopes }],
+    [PlatformLink.completeAuth, {}, { linkId, userId, platform, tokenExpiration, scopes }],
   ),
-  then: actions([Requesting.respond, { request, linkId, platform, tokenExpiration, scopes }]),
+  then: actions([Requesting.respond, { request, linkId, userId, platform, tokenExpiration, scopes }]),
 });
 
 /**
@@ -141,6 +141,18 @@ export const SyncLibraryFromSpotifyResponse: Sync = ({ request, synced, counts }
     [PlatformLink.syncLibraryFromSpotify, {}, { synced, counts }],
   ),
   then: actions([Requesting.respond, { request, synced, counts }]),
+});
+
+/**
+ * Sync: Sync Library From Spotify Error Response
+ * Handles error responses from syncLibraryFromSpotify
+ */
+export const SyncLibraryFromSpotifyErrorResponse: Sync = ({ request, error }) => ({
+  when: actions(
+    [Requesting.request, { path: "/PlatformLink/syncLibraryFromSpotify" }, { request }],
+    [PlatformLink.syncLibraryFromSpotify, {}, { error }],
+  ),
+  then: actions([Requesting.respond, { request, error }]),
 });
 
 /**

@@ -64,6 +64,18 @@ export const IngestFromLibraryCacheResponse: Sync = ({ request, ingested, ensure
 });
 
 /**
+ * Sync: Ingest From Library Cache Error Response
+ * Handles when TrackScoring.ingestFromLibraryCache returns an error
+ */
+export const IngestFromLibraryCacheErrorResponse: Sync = ({ request, error }) => ({
+  when: actions(
+    [Requesting.request, { path: "/TrackScoring/ingestFromLibraryCache" }, { request }],
+    [TrackScoring.ingestFromLibraryCache, {}, { error }],
+  ),
+  then: actions([Requesting.respond, { request, error }]),
+});
+
+/**
  * Sync: Update Weights Request
  * Forwards to TrackScoring.updateWeights only if authentication succeeds
  */

@@ -124,6 +124,15 @@ async function spotifyGet<T>(accessToken: string, path: string): Promise<T> {
       : typeof payload?.error_description === "string"
         ? payload.error_description
         : `Spotify API request failed (${res.status})`;
+    
+    // Enhanced logging for debugging 403 errors
+    console.error(`[Spotify API Error] ${res.status} ${message}`);
+    console.error(`[Spotify API Error] URL: ${url}`);
+    console.error(`[Spotify API Error] Token preview: ${accessToken.substring(0, 20)}...`);
+    if (payload) {
+      console.error(`[Spotify API Error] Full response:`, JSON.stringify(payload, null, 2));
+    }
+    
     throw new Error(message);
   }
   return payload as T;
