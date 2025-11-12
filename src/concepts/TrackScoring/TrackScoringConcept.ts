@@ -223,6 +223,7 @@ export default class TrackScoringConcept {
    * @returns An array of track IDs.
    * @requires Scores exist for the user.
    * @effects Returns trackIds sorted by their score in descending order.
+   * If no data exists, attempts to auto-ingest from LibraryCache before returning empty.
    */
   async preview({ userId, size = 50 }: { userId: User; size?: number }): Promise<{ trackIds: Track[]; tracks: PreviewEntry[]; source: PreviewSource } | { error: string }> {
     if (!userId) {
@@ -239,6 +240,22 @@ export default class TrackScoringConcept {
     const bootstrapped = await this.bootstrapScores(userId, limit);
     if (bootstrapped.length) {
       return { trackIds: bootstrapped.map((entry) => entry.trackId), tracks: bootstrapped, source: "bootstrap" };
+    }
+
+    // No scores or stats found - try to auto-ingest from LibraryCache
+    console.log(`[TrackScoring] No data found for user ${userId}, attempting auto-ingest from LibraryCache`);
+    const ingestResult = await this.ingestFromLibraryCache({ userId });
+    if (ingestResult && typeof ingestResult === "object" && "error" in ingestResult) {
+      console.error(`[TrackScoring] Auto-ingest failed:`, ingestResult.error);
+      return { trackIds: [], tracks: [], source: "empty" };
+    }
+
+    console.log(`[TrackScoring] Auto-ingest successful, ingested ${ingestResult.ingested} tracks`);
+    
+    // Retry bootstrap after ingestion
+    const bootstrappedAfterIngest = await this.bootstrapScores(userId, limit);
+    if (bootstrappedAfterIngest.length) {
+      return { trackIds: bootstrappedAfterIngest.map((entry) => entry.trackId), tracks: bootstrappedAfterIngest, source: "bootstrap" };
     }
 
     return { trackIds: [], tracks: [], source: "empty" };
